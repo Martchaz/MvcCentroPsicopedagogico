@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MvcCentroPsicopedagogico.Data;
 using MvcCentroPsicopedagogico.Models.Paciente;
+using MvcCentroPsicopedagogico.Filters; 
 
 namespace MvcCentroPsicopedagogico.Controllers
 {
+    [CustomAuthorizationFilter]
     public class PacientesController : Controller
     {
         private readonly MvcCentroPsicopedagogicoContext _context;
@@ -50,8 +52,6 @@ namespace MvcCentroPsicopedagogico.Controllers
         }
 
         // POST: Pacientes/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Nombre,Apellido,FechaNacimiento,Telefono,Email")] Paciente paciente)
@@ -82,8 +82,6 @@ namespace MvcCentroPsicopedagogico.Controllers
         }
 
         // POST: Pacientes/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Nombre,Apellido,FechaNacimiento,Telefono,Email")] Paciente paciente)
@@ -155,3 +153,4 @@ namespace MvcCentroPsicopedagogico.Controllers
         }
     }
 }
+

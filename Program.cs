@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using MvcCentroPsicopedagogico.Data;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,25 +10,26 @@ builder.Services.AddDbContext<MvcCentroPsicopedagogicoContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DatabaseConnection")
     ?? throw new InvalidOperationException("Connection string 'DatabaseConnection' not found.")));
 
+// Servicios de sesión
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession();
 
-// Add services to the container.
+// Servicios MVC
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddAuthentication("Cookies").AddCookie("Cookies", options =>
-{
-    options.LoginPath = "/Login/Login";
-    options.AccessDeniedPath = "/Login/Login";
-
-    // Expiración automática 2 minutos
-    options.ExpireTimeSpan = TimeSpan.FromMinutes(2);
-    options.SlidingExpiration = true; // Renovación automática con cada request
-});
+// Autenticación con cookies (usando la constante recomendada)
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+    {
+        options.LoginPath = "/Login/Login";
+        options.AccessDeniedPath = "/Login/Login";
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(2); // Expira en 2 minutos
+        options.SlidingExpiration = true; // Renovación automática
+    });
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configuración del pipeline HTTP
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -39,10 +41,12 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+// Middleware en el orden correcto
 app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Ruta por defecto
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Login}/{action=Login}/{id?}");
