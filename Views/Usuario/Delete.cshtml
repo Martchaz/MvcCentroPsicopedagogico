@@ -1,0 +1,18 @@
+﻿@model MvcCentroPsicopedagogico.Models.Usuarios.Usuario
+
+@{
+    ViewData["Title"] = "Eliminar Usuario";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<h3>¿Estás seguro de que quieres eliminar el usuario @Model.User?</h3>
+
+<form asp-action="DeleteConfirmed">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-danger">Eliminar</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </div>
+</form>

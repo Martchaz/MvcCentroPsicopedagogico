@@ -1,0 +1,26 @@
+# Archivos de compilación
+bin/
+obj/
+
+# Archivos del entorno de desarrollo
+.vs/
+*.user
+*.suo
+
+# Configuraciones locales sensibles
+appsettings.Development.json
+secrets.json
+
+# Publicación y paquetes
+*.publish/
+*.dbmdl
+*.log
+*.sqlite
+*.sqlite3
+
+# Archivos temporales
+*.tmp
+*.temp
+
+# Carpetas generadas automáticamente
+wwwroot/

@@ -1,0 +1,67 @@
+﻿@model IEnumerable<MvcCentroPsicopedagogico.Models.Paciente.Paciente>
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Bienvenido, @User.Identity.Name</h1>
+    <p>Estás en el sistema de gestión de pacientes. Puedes gestionar los pacientes, ver la lista y realizar otras acciones.</p>
+
+    <p>Aprende más sobre cómo <a href="https://learn.microsoft.com/aspnet/core">crear aplicaciones web con ASP.NET Core</a>.</p>
+</div>
+
+<!-- CRUD de Pacientes -->
+<h2>Gestión de Pacientes</h2>
+
+<p>
+    <a asp-controller="Pacientes" asp-action="Create" class="btn btn-primary">Crear Nuevo Paciente</a>
+</p>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Fecha Nacimiento</th>
+                <th>Teléfono</th>
+                <th>Email</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var paciente in Model)
+            {
+                <tr>
+                    <td>@paciente.Nombre</td>
+                    <td>@paciente.Apellido</td>
+                    <td>@paciente.FechaNacimiento.ToShortDateString()</td>
+                    <td>@paciente.Telefono</td>
+                    <td>@paciente.Email</td>
+                    <td>
+                        <a asp-controller="Pacientes" asp-action="Edit" asp-route-id="@paciente.Id" class="btn btn-warning">Editar</a>
+                        <a asp-controller="Pacientes" asp-action="Delete" asp-route-id="@paciente.Id" class="btn btn-danger">Eliminar</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No hay pacientes registrados aún.</p>
+}
+
+<!-- Sección para agregar fotos (a futuro) -->
+<h3>Cargar Foto (Próximamente)</h3>
+<p>En esta sección podrás cargar fotos de los pacientes en el futuro. Este es un placeholder por ahora.</p>
+<form method="post" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="photo">Seleccionar foto para cargar</label>
+        <input type="file" id="photo" name="photo" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-success">Subir Foto</button>
+</form>
+/form>

@@ -1,0 +1,29 @@
+﻿@model MvcCentroPsicopedagogico.Models.Usuarios.Usuario
+
+@{
+    ViewData["Title"] = "Editar Usuario";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form asp-action="Edit">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="form-group">
+        <label asp-for="User" class="control-label"></label>
+        <input asp-for="User" class="form-control" />
+        <span asp-validation-for="User" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Password" class="control-label"></label>
+        <input asp-for="Password" class="form-control" />
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+    </div>
+</form>
+
+<a asp-action="Index" class="btn btn-secondary mt-2">Cancelar</a>
