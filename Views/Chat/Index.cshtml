@@ -1,0 +1,137 @@
+﻿@{
+    ViewData["Title"] = "ChatBot";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // asegurate de tener un layout o sacá esta línea
+}
+
+<style>
+    body {
+        font-family: 'Segoe UI', sans-serif;
+        background: #f5f7fa;
+        padding: 20px;
+    }
+
+    .chat-container {
+        width: 100%;
+        max-width: 600px;
+        margin: auto;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+    }
+
+    .chat-title {
+        font-size: 1.8rem;
+        margin-bottom: 10px;
+        color: #333;
+        text-align: center;
+    }
+
+    #chatArea {
+        height: 300px;
+        overflow-y: auto;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 10px;
+        margin-bottom: 15px;
+        background-color: #fdfdfd;
+    }
+
+    .message {
+        margin: 10px 0;
+        padding: 10px 15px;
+        border-radius: 20px;
+        max-width: 80%;
+        word-wrap: break-word;
+    }
+
+    .user-message {
+        background: #daf1fc;
+        align-self: flex-end;
+        text-align: right;
+        margin-left: auto;
+    }
+
+    .bot-message {
+        background: #e2e2e2;
+        align-self: flex-start;
+        margin-right: auto;
+    }
+
+    .input-group {
+        display: flex;
+        gap: 10px;
+    }
+
+    input[type="text"] {
+        flex: 1;
+        padding: 10px;
+        border-radius: 20px;
+        border: 1px solid #ccc;
+        font-size: 1rem;
+    }
+
+    button {
+        padding: 10px 20px;
+        border: none;
+        background-color: #2196f3;
+        color: white;
+        border-radius: 20px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    button:hover {
+        background-color: #1976d2;
+    }
+</style>
+
+<div class="chat-container">
+    <h2 class="chat-title">💬 ChatBot</h2>
+
+    <div id="chatArea" class="d-flex flex-column"></div>
+
+    <div class="input-group">
+        <input type="text" id="userMessage" placeholder="Escribí algo..." onkeydown="if(event.key==='Enter') sendMessage()" />
+        <button onclick="sendMessage()">Enviar</button>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function sendMessage() {
+            const input = document.getElementById("userMessage");
+            const message = input.value.trim();
+            if (!message) return;
+
+            const area = document.getElementById("chatArea");
+
+            // Mostrar mensaje del usuario
+            const userBubble = document.createElement("div");
+            userBubble.className = "message user-message";
+            userBubble.innerText = message;
+            area.appendChild(userBubble);
+
+            // Limpiar input
+            input.value = "";
+
+            fetch("/Chat/GetResponse", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: "message=" + encodeURIComponent(message)
+            })
+                .then(res => res.json())
+                .then(data => {
+                    const botBubble = document.createElement("div");
+                    botBubble.className = "message bot-message";
+                    botBubble.innerText = data.response;
+                    area.appendChild(botBubble);
+
+                    // Scroll hacia abajo
+                    area.scrollTop = area.scrollHeight;
+                });
+        }
+    </script>
+}

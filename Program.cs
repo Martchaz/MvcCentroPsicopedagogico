@@ -2,8 +2,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using MvcCentroPsicopedagogico.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using MvcCentroPsicopedagogico.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+//  chatbot
+builder.Services.AddSingleton<ChatBotService>();
 
 // Agregar el contexto de la base de datos con la conexión correcta
 builder.Services.AddDbContext<MvcCentroPsicopedagogicoContext>(options =>
