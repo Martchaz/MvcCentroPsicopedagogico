@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using MvcCentroPsicopedagogico.Models;
+using MvcCentroPsicopedagogico.Models.ChatBot;
 using MvcCentroPsicopedagogico.Models.Paciente;
-using MvcCentroPsicopedagogico.Models.Usuarios; // Asegúrate de tener el espacio de nombres correcto para tus modelos
+using MvcCentroPsicopedagogico.Models.Usuarios;
 
 namespace MvcCentroPsicopedagogico.Data
 {
@@ -14,6 +15,9 @@ namespace MvcCentroPsicopedagogico.Data
 
         public DbSet<Usuario> Usuario { get; set; }
         public DbSet<Paciente> Paciente { get; set; }
-        // Aquí puedes agregar más DbSet para las entidades que necesites
+
+        // <-- Agregá estos dos:
+        public DbSet<ChatConversation> ChatConversations { get; set; }
+        public DbSet<ChatMessage> ChatMessages { get; set; }
     }
 }

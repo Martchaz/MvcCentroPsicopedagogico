@@ -5,10 +5,16 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using MvcCentroPsicopedagogico.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-//  chatbot
-builder.Services.AddSingleton<ChatBotService>();
 
-// Agregar el contexto de la base de datos con la conexión correcta
+// Inyección de dependencias para servicios del chatbot
+builder.Services.AddScoped<IKnowledgeBaseService, KnowledgeBaseService>();
+builder.Services.AddScoped<IAppointmentService, AppointmentService>();
+builder.Services.AddScoped<INaturalLanguageProcessor, NaturalLanguageProcessor>();
+builder.Services.AddScoped<ChatBotService>();
+
+builder.Services.AddControllers();
+
+// Agregar el contexto de la base de datos
 builder.Services.AddDbContext<MvcCentroPsicopedagogicoContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DatabaseConnection")
     ?? throw new InvalidOperationException("Connection string 'DatabaseConnection' not found.")));
@@ -20,19 +26,18 @@ builder.Services.AddSession();
 // Servicios MVC
 builder.Services.AddControllersWithViews();
 
-// Autenticación con cookies (usando la constante recomendada)
+// Autenticación con cookies
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
     {
         options.LoginPath = "/Login/Login";
         options.AccessDeniedPath = "/Login/Login";
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(2); // Expira en 2 minutos
-        options.SlidingExpiration = true; // Renovación automática
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(2);
+        options.SlidingExpiration = true;
     });
 
 var app = builder.Build();
 
-// Configuración del pipeline HTTP
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -41,18 +46,16 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
 
-// Middleware en el orden correcto
 app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Ruta por defecto
+app.MapControllers();
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Login}/{action=Login}/{id?}");
 
 app.Run();
-

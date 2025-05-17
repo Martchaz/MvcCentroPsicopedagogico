@@ -1,38 +1,75 @@
-﻿using System.Text.Json;
+﻿using MvcCentroPsicopedagogico.Models.ChatBot;
 using MvcCentroPsicopedagogico.Models;
+using MvcCentroPsicopedagogico.Data;
+using Microsoft.EntityFrameworkCore;
+using MvcCentroPsicopedagogico.Services; // <-- clave
 
 namespace MvcCentroPsicopedagogico.Services
 {
     public class ChatBotService
     {
-        private readonly string _jsonPath;
-        private ChatBotData _chatData;
+        private readonly MvcCentroPsicopedagogicoContext _context;
+        private readonly IKnowledgeBaseService _knowledgeService;
+        private readonly IAppointmentService _appointmentService;
+        private readonly INaturalLanguageProcessor _nlpProcessor;
 
-        public ChatBotService(IWebHostEnvironment env)
+        public ChatBotService(
+            MvcCentroPsicopedagogicoContext context,
+            IKnowledgeBaseService knowledgeService,
+            IAppointmentService appointmentService,
+            INaturalLanguageProcessor nlpProcessor)
         {
-            _jsonPath = Path.Combine(env.WebRootPath, "data", "intents.json");
-            LoadIntents();
+            _context = context;
+            _knowledgeService = knowledgeService;
+            _appointmentService = appointmentService;
+            _nlpProcessor = nlpProcessor;
         }
 
-        private void LoadIntents()
+        public async Task<ChatResponse> ProcessMessageAsync(string message, UserContext userContext)
         {
-            var json = File.ReadAllText(_jsonPath);
-            _chatData = JsonSerializer.Deserialize<ChatBotData>(json);
-        }
+            var intent = await _nlpProcessor.ExtractIntentAsync(message);
 
-        public string GetResponse(string message)
-        {
-            var intent = _chatData.intents.FirstOrDefault(i =>
-                i.patterns.Any(p => message.ToLower().Contains(p.ToLower()))
-            );
-
-            if (intent != null && intent.responses.Any())
+            switch (intent)
             {
-                var rnd = new Random();
-                return intent.responses[rnd.Next(intent.responses.Count)];
-            }
+                case "Turno_Consulta":
+                    var opciones = await _appointmentService.GetAvailableAppointmentsAsync(userContext);
+                    return new ChatResponse
+                    {
+                        Text = "Estas son las opciones de turnos disponibles:",
+                        QuickReplies = opciones.Select(o => new QuickReply
+                        {
+                            Title = o.ToString(),
+                            Value = o.Id.ToString()
+                        }).ToList(),
+                        RequiresHuman = false
+                    };
 
-            return "Lo siento, no entendí tu pregunta.";
+                case "Ayuda":
+                    var respuesta = await _knowledgeService.GetAnswerAsync(message);
+                    return new ChatResponse
+                    {
+                        Text = respuesta ?? "No encontré una respuesta clara, ¿podés reformularlo?",
+                        QuickReplies = new List<QuickReply>(),
+                        RequiresHuman = respuesta == null
+                    };
+
+                default:
+                    return new ChatResponse
+                    {
+                        Text = "No entendí tu mensaje. ¿Podés ser más específico?",
+                        QuickReplies = new List<QuickReply>(),
+                        RequiresHuman = true
+                    };
+            }
+        }
+
+        public async Task<List<ChatMessage>> GetConversationHistoryAsync(string userId)
+        {
+            return await _context.ChatMessages
+                .Include(m => m.Conversation)
+                .Where(m => m.Conversation.UserId == userId)
+                .OrderBy(m => m.Timestamp)
+                .ToListAsync();
         }
     }
 }

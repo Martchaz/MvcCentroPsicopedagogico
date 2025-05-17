@@ -64,4 +64,50 @@ else
     </div>
     <button type="submit" class="btn btn-success">Subir Foto</button>
 </form>
-/form>
+
+<!-- Botón del chat bot -->
+<button id="botonChat" onclick="mostrarChat()">
+    <img src="/imagen/ChatBot.png" alt="ChatBot" />
+</button>
+
+<!-- Ventana emergente del chatbot -->
+<div id="ventanaChat" style="display: none; position: fixed; bottom: 80px; right: 20px; width: 300px; background: white; border: 1px solid #ccc; border-radius: 10px; padding: 10px;">
+    <div id="mensajesChat" style="height: 200px; overflow-y: auto; margin-bottom: 10px;"></div>
+    <input type="text" id="inputChat" placeholder="Escribí tu mensaje..." class="form-control mb-2" />
+    <div class="d-flex justify-content-between">
+        <button onclick="enviarAlBot()" class="btn btn-primary">Enviar</button>
+        <button onclick="cerrarChat()" class="btn btn-danger">X</button>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function mostrarChat() {
+            document.getElementById('ventanaChat').style.display = 'block';
+        }
+
+        function cerrarChat() {
+            document.getElementById('ventanaChat').style.display = 'none';
+        }
+
+        function enviarAlBot() {
+            const input = document.getElementById('inputChat');
+            const mensajes = document.getElementById('mensajesChat');
+            const mensaje = input.value.trim();
+
+            if (mensaje !== '') {
+                const nuevoMensaje = document.createElement('div');
+                nuevoMensaje.textContent = "Tú: " + mensaje;
+                mensajes.appendChild(nuevoMensaje);
+                input.value = '';
+
+                // Respuesta ficticia del bot
+                const respuesta = document.createElement('div');
+                respuesta.textContent = "Bot: Gracias por tu mensaje.";
+                mensajes.appendChild(respuesta);
+
+                mensajes.scrollTop = mensajes.scrollHeight;
+            }
+        }
+    </script>
+}
